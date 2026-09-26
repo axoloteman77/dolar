@@ -99,7 +99,7 @@ const themeToggle = document.getElementById("themeToggle");
 
 function applyTheme(theme){
   document.documentElement.setAttribute("data-theme", theme);
-  themeToggle.textContent = theme === "dark" ? "☀️ Modo claro" : "🌙 Modo oscuro";
+  themeToggle.textContent = theme === "dark" ? "☀︎ Modo claro" : "⏾ Modo oscuro";
   localStorage.setItem("tcTheme", theme);
   renderChart(lastChartData); // el gráfico usa colores de variables CSS, hay que redibujarlo
 }
