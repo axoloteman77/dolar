@@ -118,15 +118,15 @@ function renderChart(data){
   for(let t=0; t<=ticks; t++){
     const val = minVal + (maxVal - minVal) * t / ticks;
     const y = yPos(val);
-    gridLines += `<line x1="${margin.left}" y1="${y}" x2="${width-margin.right}" y2="${y}" stroke="#1c283f" stroke-width="1"/>`;
-    yLabels += `<text x="${margin.left-8}" y="${y+4}" fill="#93a1bd" font-size="11" text-anchor="end">${val.toFixed(1)}</text>`;
+    gridLines += `<line x1="${margin.left}" y1="${y}" x2="${width-margin.right}" y2="${y}" stroke="#e0ddc4" stroke-width="1"/>`;
+    yLabels += `<text x="${margin.left-8}" y="${y+4}" fill="#6b7458" font-size="11" text-anchor="end">${val.toFixed(1)}</text>`;
   }
 
   const labelEvery = Math.max(1, Math.ceil(n / 8));
   let xLabels = "";
   data.forEach((p,i) => {
     if(i % labelEvery === 0 || i === n-1){
-      xLabels += `<text x="${xPos(i)}" y="${height-margin.bottom+18}" fill="#93a1bd" font-size="10" text-anchor="middle">${p.d}</text>`;
+      xLabels += `<text x="${xPos(i)}" y="${height-margin.bottom+18}" fill="#6b7458" font-size="10" text-anchor="middle">${p.d}</text>`;
     }
   });
 
@@ -141,8 +141,8 @@ function renderChart(data){
   const svg = `
     <svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
       ${gridLines}
-      ${buildLine("of", "#4fb0ff")}
-      ${buildLine("pa", "#ff9f4f")}
+      ${buildLine("of", "#2f5233")}
+      ${buildLine("pa", "#b08a4e")}
       ${yLabels}
       ${xLabels}
     </svg>`;
