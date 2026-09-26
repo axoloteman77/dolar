@@ -31,8 +31,8 @@ const historicalData = [
   {d:"2026-09", of:12.06, pa:12.32},
 ];
 
-// Valores de referencia por defecto (fallback si las APIs en vivo fallan)
 let current = { oficial: 12.06, paralelo: 12.32 };
+let lastChartData = historicalData; // recordamos el rango activo para re-dibujar al cambiar de tema
 
 function fmtBs(n){
   return "Bs " + n.toLocaleString("es-BO", {minimumFractionDigits:2, maximumFractionDigits:2});
@@ -62,17 +62,15 @@ async function fetchLiveRates(showStatus){
 
   let oficialOk = false, paraleloOk = false;
 
-  // 1) Tipo de cambio oficial (BCB), vía API independiente CUCU
   try{
     const res = await fetch("https://apibcb.cucu.bo/api/v1/tc/oficial");
     const data = await res.json();
     if(data && data.tc_oficial && typeof data.tc_oficial.compra === "number"){
-      current.oficial = data.tc_oficial.compra; // TCO = tipo de cambio oficial de compra
+      current.oficial = data.tc_oficial.compra;
       oficialOk = true;
     }
   }catch(err){ /* se mantiene el valor de referencia */ }
 
-  // 2) Dólar paralelo, vía paralelo.bo
   try{
     const res = await fetch("https://paralelo.bo/api/v1/rate");
     const data = await res.json();
@@ -94,15 +92,39 @@ async function fetchLiveRates(showStatus){
     status.textContent = "No se pudo conectar con las APIs en vivo (red bloqueada o caída). Se mantienen los valores de referencia (sept/2026).";
   }
 }
-
 document.getElementById("fetchBtn").addEventListener("click", () => fetchLiveRates(true));
 
+// ---------- Modo claro / oscuro ----------
+const themeToggle = document.getElementById("themeToggle");
+
+function applyTheme(theme){
+  document.documentElement.setAttribute("data-theme", theme);
+  themeToggle.textContent = theme === "dark" ? "☀️ Modo claro" : "🌙 Modo oscuro";
+  localStorage.setItem("tcTheme", theme);
+  renderChart(lastChartData); // el gráfico usa colores de variables CSS, hay que redibujarlo
+}
+
+themeToggle.addEventListener("click", () => {
+  const current = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+  applyTheme(current === "dark" ? "light" : "dark");
+});
+
 // ---------- Gráfico SVG hecho a mano (sin librerías externas) ----------
+function cssVar(name){
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
 function renderChart(data){
+  lastChartData = data;
   const width = 800, height = 320;
   const margin = { top: 20, right: 20, bottom: 36, left: 46 };
   const innerW = width - margin.left - margin.right;
   const innerH = height - margin.top - margin.bottom;
+
+  const colorGrid = cssVar("--grid-line") || "#e0ddc4";
+  const colorMuted = cssVar("--muted") || "#6b7458";
+  const colorOficial = cssVar("--oficial") || "#2f5233";
+  const colorParalelo = cssVar("--paralelo") || "#b08a4e";
 
   const allValues = data.flatMap(p => [p.of, p.pa]);
   const maxVal = Math.ceil(Math.max(...allValues) * 1.1);
@@ -118,15 +140,15 @@ function renderChart(data){
   for(let t=0; t<=ticks; t++){
     const val = minVal + (maxVal - minVal) * t / ticks;
     const y = yPos(val);
-    gridLines += `<line x1="${margin.left}" y1="${y}" x2="${width-margin.right}" y2="${y}" stroke="#e0ddc4" stroke-width="1"/>`;
-    yLabels += `<text x="${margin.left-8}" y="${y+4}" fill="#6b7458" font-size="11" text-anchor="end">${val.toFixed(1)}</text>`;
+    gridLines += `<line x1="${margin.left}" y1="${y}" x2="${width-margin.right}" y2="${y}" stroke="${colorGrid}" stroke-width="1"/>`;
+    yLabels += `<text x="${margin.left-8}" y="${y+4}" fill="${colorMuted}" font-size="11" text-anchor="end">${val.toFixed(1)}</text>`;
   }
 
   const labelEvery = Math.max(1, Math.ceil(n / 8));
   let xLabels = "";
   data.forEach((p,i) => {
     if(i % labelEvery === 0 || i === n-1){
-      xLabels += `<text x="${xPos(i)}" y="${height-margin.bottom+18}" fill="#6b7458" font-size="10" text-anchor="middle">${p.d}</text>`;
+      xLabels += `<text x="${xPos(i)}" y="${height-margin.bottom+18}" fill="${colorMuted}" font-size="10" text-anchor="middle">${p.d}</text>`;
     }
   });
 
@@ -141,8 +163,8 @@ function renderChart(data){
   const svg = `
     <svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
       ${gridLines}
-      ${buildLine("of", "#2f5233")}
-      ${buildLine("pa", "#b08a4e")}
+      ${buildLine("of", colorOficial)}
+      ${buildLine("pa", colorParalelo)}
       ${yLabels}
       ${xLabels}
     </svg>`;
@@ -165,6 +187,10 @@ document.querySelectorAll(".range-btns button").forEach(btn => {
 });
 
 // ---------- Inicio ----------
-updateCards();          // muestra valores de referencia al instante
+const savedTheme = localStorage.getItem("tcTheme") || "light";
+document.documentElement.setAttribute("data-theme", savedTheme);
+themeToggle.textContent = savedTheme === "dark" ? "☀️ Modo claro" : "🌙 Modo oscuro";
+
+updateCards();
 renderChart(historicalData);
-fetchLiveRates(false);  // intenta traer datos reales apenas carga la página, sin bloquear la vista inicial
+fetchLiveRates(false);

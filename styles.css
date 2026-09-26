@@ -1,5 +1,6 @@
 :root{
   --bg: #f3efe0;
+  --bg-gradient: #eef2df;
   --bg-card: #ffffff;
   --bg-card-2: #eef0dc;
   --border: #d8d6ba;
@@ -9,21 +10,51 @@
   --paralelo: #b08a4e;
   --brecha: #a4443c;
   --good: #3f6b3f;
+  --input-bg: #faf8ee;
+  --grid-line: #e0ddc4;
+  --on-accent: #ffffff;
+  --shadow: rgba(47,82,51,0.08);
   --radius: 16px;
 }
+:root[data-theme="dark"]{
+  --bg: #10190f;
+  --bg-gradient: #182a1a;
+  --bg-card: #1c2a22;
+  --bg-card-2: #24352a;
+  --border: #35493c;
+  --text: #eaf0e2;
+  --muted: #9db08e;
+  --oficial: #7fd79a;
+  --paralelo: #e0b978;
+  --brecha: #e8897f;
+  --good: #8fe0a8;
+  --input-bg: #22301f;
+  --grid-line: #2c3c30;
+  --on-accent: #0e1710;
+  --shadow: rgba(0,0,0,0.35);
+}
+
 *{box-sizing:border-box;}
 body{
   margin:0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-  background: radial-gradient(circle at 20% 0%, #eef2df 0%, var(--bg) 55%);
+  background: radial-gradient(circle at 20% 0%, var(--bg-gradient) 0%, var(--bg) 55%);
   color: var(--text);
   min-height:100vh;
   padding: 24px 16px 60px;
+  transition: background .25s ease, color .25s ease;
 }
 .wrap{ max-width: 1000px; margin: 0 auto; }
 header{ text-align:center; margin-bottom: 28px; }
 header h1{ font-size: clamp(22px, 4vw, 32px); margin:0 0 6px; color: var(--oficial); }
-header p{ color: var(--muted); margin:0; font-size: 14px; }
+header p{ color: var(--muted); margin:0 0 14px; font-size: 14px; }
+
+.theme-toggle{
+  background: var(--bg-card); border:1px solid var(--border); color: var(--text);
+  padding:8px 16px; border-radius:20px; font-size:13px; cursor:pointer;
+  transition: all .15s;
+}
+.theme-toggle:hover{ border-color: var(--oficial); }
 
 .cards{
   display:grid;
@@ -36,7 +67,7 @@ header p{ color: var(--muted); margin:0; font-size: 14px; }
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 18px 20px;
-  box-shadow: 0 2px 6px rgba(47,82,51,0.08);
+  box-shadow: 0 2px 6px var(--shadow);
 }
 .card .label{ color:var(--muted); font-size:13px; text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; }
 .card .value{ font-size: 30px; font-weight:700; color: var(--text); }
@@ -51,7 +82,7 @@ section{
   border-radius: var(--radius);
   padding: 20px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 6px rgba(47,82,51,0.06);
+  box-shadow: 0 2px 6px var(--shadow);
 }
 h2{ font-size: 17px; margin:0 0 14px; display:flex; align-items:center; gap:8px; color: var(--oficial); }
 
@@ -61,24 +92,24 @@ h2{ font-size: 17px; margin:0 0 14px; display:flex; align-items:center; gap:8px;
 .field{ display:flex; flex-direction:column; gap:6px; }
 .field label{ font-size:12px; color:var(--muted); }
 input[type=number], select{
-  background:#faf8ee; border:1px solid var(--border); color:var(--text);
+  background:var(--input-bg); border:1px solid var(--border); color:var(--text);
   padding:10px 12px; border-radius:10px; font-size:15px; min-width:150px;
 }
 .result{
   flex:1; min-width:220px;
-  background:#faf8ee; border:1px dashed var(--border); border-radius:10px;
-  padding:12px 16px; font-size:18px; font-weight:600;
+  background:var(--input-bg); border:1px dashed var(--border); border-radius:10px;
+  padding:12px 16px; font-size:18px; font-weight:600; color: var(--text);
 }
 .result span{ color: var(--good); }
 
 .range-btns{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
 .range-btns button{
-  background:#faf8ee; border:1px solid var(--border); color:var(--muted);
+  background:var(--input-bg); border:1px solid var(--border); color:var(--muted);
   padding:7px 14px; border-radius:20px; font-size:13px; cursor:pointer;
   transition: all .15s;
 }
 .range-btns button.active, .range-btns button:hover{
-  color:#fff; border-color: var(--oficial); background: var(--oficial);
+  color: var(--on-accent); border-color: var(--oficial); background: var(--oficial);
 }
 
 .legend-note{ display:flex; gap:18px; flex-wrap:wrap; font-size:12px; color:var(--muted); margin-top:10px; }
@@ -91,7 +122,7 @@ input[type=number], select{
 
 .refresh-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:10px; }
 .refresh-row button{
-  background: var(--oficial); color:#fff; border:none; padding:9px 16px;
+  background: var(--oficial); color: var(--on-accent); border:none; padding:9px 16px;
   border-radius:10px; font-weight:600; cursor:pointer; font-size:13px;
 }
 #fetchStatus{ font-size:12px; color: var(--muted); }
