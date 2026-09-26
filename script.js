@@ -189,7 +189,7 @@ document.querySelectorAll(".range-btns button").forEach(btn => {
 // ---------- Inicio ----------
 const savedTheme = localStorage.getItem("tcTheme") || "light";
 document.documentElement.setAttribute("data-theme", savedTheme);
-themeToggle.textContent = savedTheme === "dark" ? "☀️ Modo claro" : "🌙 Modo oscuro";
+themeToggle.textContent = savedTheme === "dark" ? "☀︎ Modo claro" : "⏾ Modo oscuro";
 
 updateCards();
 renderChart(historicalData);
